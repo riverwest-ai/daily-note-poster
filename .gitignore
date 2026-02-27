@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+ENV/
+env/
+
+# Environment Variables
+.env
+
+# MacOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# App specific data
+browser_data/
+chrome_session/
+articles/

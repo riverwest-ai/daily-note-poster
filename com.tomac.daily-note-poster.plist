@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.tomac.daily-note-poster</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/tomac/.gemini/antigravity/scratch/daily-note-poster/run.sh</string>
+    </array>
+
+    <!-- 1日2回実行: 朝7:30と夜19:30（その後0〜30分のランダム遅延） -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict>
+            <key>Hour</key>
+            <integer>7</integer>
+            <key>Minute</key>
+            <integer>30</integer>
+        </dict>
+        <dict>
+            <key>Hour</key>
+            <integer>19</integer>
+            <key>Minute</key>
+            <integer>30</integer>
+        </dict>
+    </array>
+
+    <!-- ログ出力 -->
+    <key>StandardOutPath</key>
+    <string>/Users/tomac/.gemini/antigravity/scratch/daily-note-poster/logs/launchd_stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/tomac/.gemini/antigravity/scratch/daily-note-poster/logs/launchd_stderr.log</string>
+
+    <!-- 実行ディレクトリ -->
+    <key>WorkingDirectory</key>
+    <string>/Users/tomac/.gemini/antigravity/scratch/daily-note-poster</string>
+
+    <!-- 環境変数 -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/tomac</string>
+        <key>DISPLAY</key>
+        <string>:0</string>
+    </dict>
+</dict>
+</plist>
