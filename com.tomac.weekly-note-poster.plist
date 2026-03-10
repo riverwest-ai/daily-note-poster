@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- 週次「手書き風」深掘り記事の自動投稿 (毎週日曜 20:00) -->
+    <key>Label</key>
+    <string>com.tomac.weekly-note-poster</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/tomac/.gemini/antigravity/scratch/daily-note-poster/run_weekly.sh</string>
+    </array>
+
+    <!-- 毎週日曜日 20:00 に実行 -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>0</integer>  <!-- 0=日曜日 -->
+        <key>Hour</key>
+        <integer>20</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/tomac/.gemini/antigravity/scratch/daily-note-poster/logs/weekly_stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/tomac/.gemini/antigravity/scratch/daily-note-poster/logs/weekly_stderr.log</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>
