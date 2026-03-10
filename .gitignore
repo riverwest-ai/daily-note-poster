@@ -22,3 +22,6 @@ logs/
 browser_data/
 chrome_session/
 articles/
+weekly_articles/
+thumbnails/
+posted_urls.json

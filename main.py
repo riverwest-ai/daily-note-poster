@@ -1,8 +1,8 @@
-from news_fetcher import fetch_latest_news
+from news_fetcher import fetch_latest_news, save_posted_urls_bulk
 from article_generator import generate_article
 from note_poster import post_to_note
-# from svg_generator import generate_svg_code
-# from image_renderer import render_svg_to_png
+from svg_generator import generate_svg_code
+from image_renderer import render_svg_to_png
 import random
 import time
 import os
@@ -10,7 +10,16 @@ from datetime import datetime
 
 ARTICLES_DIR = os.path.join(os.path.dirname(__file__), "articles")
 
-def save_article_to_file(article: dict) -> str:
+# 週次記事への誘導文（無料記事末尾に自動挿入）
+WEEKLY_CTA = """
+
+---
+
+毎週日曜日は、ぎんじが一つのテーマを深掘りした読み物記事を投稿しています。
+ぜひフォローして、次の記事もチェックしてみてください！
+"""
+
+def save_article_to_file(article: dict, news_list: list = None) -> str:
     """生成した記事をMarkdownファイルとして保存する。保存先パスを返す。"""
     os.makedirs(ARTICLES_DIR, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -24,6 +33,7 @@ def save_article_to_file(article: dict) -> str:
     if hashtag_line:
         content += f"{hashtag_line}\n\n"
     content += article["body"]
+    content += WEEKLY_CTA  # 週次記事への誘導文を末尾に追加
 
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(content)
@@ -58,13 +68,24 @@ def main():
         return
 
     # 3.5. ファイルに書き出す
-    saved_path = save_article_to_file(article)
+    saved_path = save_article_to_file(article, news_list)
     print(f"記事をファイルに保存しました: {saved_path}")
 
-    # 3.6. Generate image for the article (SVG based)
-    # ユーザー要望により画像生成はスキップ
-    print("Skipping image generation as per user request.")
-    article['image_path'] = None
+    # 3.6. サムネイル画像を生成 (SVG → PNG)
+    print("Generating thumbnail image...")
+    try:
+        svg_code = generate_svg_code(article['title'], article['body'][:200])
+        # thumbnailsディレクトリに保存
+        thumb_dir = os.path.join(os.path.dirname(__file__), "thumbnails")
+        os.makedirs(thumb_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        image_path = os.path.join(thumb_dir, f"{timestamp}.png")
+        render_svg_to_png(svg_code, image_path)
+        article['image_path'] = image_path
+        print(f"サムネイルを保存しました: {image_path}")
+    except Exception as e:
+        print(f"サムネイル生成に失敗しました（記事投稿は続行）: {e}")
+        article['image_path'] = None
 
     # 4. Post to Note
     print("Posting to Note (Draft)...")
@@ -72,6 +93,11 @@ def main():
     try:
         post_to_note(article, is_draft=True)
         print("Done!")
+        # 5. 投稿済みURLを記録（次回以降の重複防止）
+        posted_links = [n['link'] for n in news_list if 'link' in n]
+        if posted_links:
+            save_posted_urls_bulk(posted_links)
+            print(f"投稿済みURL {len(posted_links)} 件を記録しました。")
     except Exception as e:
         print(f"Failed to post to note: {e}")
 
