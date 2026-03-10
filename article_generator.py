@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from typing import Dict, List
 from gemini_client import call_gemini
 from ginji_profile import GINJI_PROFILE
-from hashtag_generator import generate_hashtags
 from config import STATE_FILE
 
 # Load environment variables
@@ -117,12 +116,10 @@ Markdown形式で出力してください。タイトルは一番上に `# タ�
         title = lines[0].replace('# ', '').strip()
         body = '\n'.join(lines[1:]).strip()
 
-        hashtags = generate_hashtags(title, "Tech Trend Summary")
-
         return {
             "title": title,
             "body": body,
-            "hashtags": hashtags,
+            "hashtags": [],  # 本文末に出力されるため空でOK
             "image_path": None
         }
 
