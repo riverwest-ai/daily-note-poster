@@ -2,9 +2,8 @@ name: Daily Article Generation
 
 on:
   schedule:
-    # 毎日 07:30 JST (= 22:30 UTC 前日) と 19:30 JST (= 10:30 UTC)
-    - cron: '30 22 * * *'  # 朝7:30 JST
-    - cron: '30 10 * * *'  # 夜19:30 JST
+    # 毎日 19:30 JST (= 10:30 UTC)
+    - cron: '30 10 * * *'
   workflow_dispatch:        # 手動実行も可能
 
 jobs:
