@@ -3,9 +3,7 @@ import random
 import json
 import os
 from typing import List, Dict
-
-# 投稿済みURLを記録するファイル
-POSTED_URLS_FILE = os.path.join(os.path.dirname(__file__), "posted_urls.json")
+from config import POSTED_URLS_FILE
 
 # RSSフィードソース（信頼性と多様性を考慮して選定）
 TECH_RSS_URLS = [
@@ -51,9 +49,17 @@ def save_posted_url(url: str) -> None:
 
 
 def save_posted_urls_bulk(urls: List[str]) -> None:
-    """複数の投稿済みURLをまとめて保存する。"""
-    for url in urls:
-        save_posted_url(url)
+    """複数の投稿済みURLをまとめて保存する（1回のread/writeで効率的に処理）。"""
+    if not urls:
+        return
+    posted = load_posted_urls()
+    posted.update(urls)
+    try:
+        with open(POSTED_URLS_FILE, "w", encoding="utf-8") as f:
+            json.dump({"urls": list(posted)}, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Warning: posted_urls.json の保存に失敗しました: {e}")
+
 
 
 def is_negative_news(title: str, summary: str) -> bool:

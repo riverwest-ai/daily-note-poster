@@ -1,22 +1,9 @@
-import os
-import json
-import urllib.request
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+from gemini_client import call_gemini
 
 def generate_svg_code(title: str, summary: str) -> str:
     """
     記事のタイトルとサマリーからSVGコードを生成する
     """
-    if not GOOGLE_API_KEY:
-        raise ValueError("Google Gemini API Key is missing")
-
-    model_id = "gemini-flash-latest"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_id}:generateContent?key={GOOGLE_API_KEY}"
-
     prompt = f"""
     You are a talented graphic designer. Create a simple, modern, flat-design SVG illustration for a blog post.
     
@@ -35,27 +22,16 @@ def generate_svg_code(title: str, summary: str) -> str:
     SVG Code:
     """
 
-    payload = json.dumps({
-        "contents": [{"parts": [{"text": prompt}]}]
-    })
-
-    headers = {"Content-Type": "application/json"}
-
     try:
-        req = urllib.request.Request(url, data=payload.encode("utf-8"), headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            result = json.loads(resp.read().decode("utf-8"))
-            
-        content = result["candidates"][0]["content"]["parts"][0]["text"]
-        
+        content = call_gemini(prompt)
+
         # Markdownのコードブロック記号を削除
         content = content.replace("```svg", "").replace("```xml", "").replace("```", "").strip()
-        
+
         # SVGタグが含まれているか確認
         if "<svg" not in content:
-            # 失敗した場合は単純なプレースホルダーSVGを返す
             return generate_placeholder_svg(title)
-            
+
         return content
 
     except Exception as e:

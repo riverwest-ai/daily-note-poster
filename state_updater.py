@@ -6,17 +6,15 @@ state_updater.py — ぎんじの状態を週次でAIが少しずつ更新する
 - AIが自然な人生の流れで、リアルな小さな出来事を積み重ねていく。
 - 週次記事の生成後に呼ばれる想定。
 """
-import os
 import json
-import time
-import urllib.request
-import urllib.error
+import os
 from datetime import datetime
 from dotenv import load_dotenv
+from gemini_client import call_gemini
+from ginji_profile import GINJI_PROFILE_SHORT
+from config import STATE_FILE
 
 load_dotenv()
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-STATE_FILE = os.path.join(os.path.dirname(__file__), "ginji_state.json")
 
 
 def load_state() -> dict:
@@ -38,19 +36,13 @@ def update_state_with_ai(current_state: dict) -> dict:
     AIを使ってぎんじの状態をほんの少しだけ更新する。
     変化は微細で、人間的なリアリティを持たせる。
     """
-    if not GOOGLE_API_KEY:
-        print("GOOGLE_API_KEY がないため状態更新をスキップします。")
-        return current_state
-
     today = datetime.now().strftime("%Y年%-m月%-d日")
     current_json = json.dumps(current_state, ensure_ascii=False, indent=2)
 
     prompt = f"""あなたは「ぎんじ」というキャラクターの人生を少しずつ育てるAIです。
 
 ## ぎんじについて
-- 30代SE男性、既婚（奥さんあり）、京都出身。
-- 趣味：スプラトゥーン、バドミントン、投資、ゴルフ（最近100切り達成）。
-- テクノロジーと日常を愛する、謙虚だが好奇心旺盛な人物。
+{GINJI_PROFILE_SHORT}
 
 ## 現在の状態（JSON）
 {current_json}
@@ -72,27 +64,8 @@ def update_state_with_ai(current_state: dict) -> dict:
 更新後のJSONのみを出力してください。説明文や```は不要です。
 """
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GOOGLE_API_KEY}"
-    payload = json.dumps({
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1024}
-    })
-    headers = {"Content-Type": "application/json"}
-
     try:
-        req = urllib.request.Request(url, data=payload.encode("utf-8"), headers=headers, method="POST")
-        for attempt in range(3):
-            try:
-                with urllib.request.urlopen(req, timeout=60) as resp:
-                    result = json.loads(resp.read().decode("utf-8"))
-                break
-            except urllib.error.HTTPError as e:
-                if e.code == 429 and attempt < 2:
-                    time.sleep(20 * (attempt + 1))
-                else:
-                    raise
-
-        content = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+        content = call_gemini(prompt, temperature=0.7, max_tokens=1024)
 
         # ```json ``` ブロックがある場合は除去
         content = content.replace("```json", "").replace("```", "").strip()
