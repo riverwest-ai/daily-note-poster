@@ -11,6 +11,35 @@ from hashtag_generator import generate_hashtags
 load_dotenv()
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+STATE_FILE = os.path.join(os.path.dirname(__file__), "ginji_state.json")
+
+
+def load_ginji_state() -> str:
+    """ginji_state.json からぎんじの現在の状態を読み込んでテキスト化する。"""
+    if not os.path.exists(STATE_FILE):
+        return ""
+    try:
+        with open(STATE_FILE, "r", encoding="utf-8") as f:
+            state = json.load(f)
+        lines = []
+        if state.get("general_vibe"):
+            lines.append(f"- 最近の状況・気分: {state['general_vibe']}")
+        if state.get("recent_events"):
+            lines.append("- 最近の出来事:")
+            for ev in state["recent_events"]:
+                lines.append(f"  ・{ev}")
+        interests = state.get("ongoing_interests", {})
+        if interests.get("golf", {}).get("note"):
+            lines.append(f"- ゴルフ近況: {interests['golf']['note']}")
+        if interests.get("investment", {}).get("note"):
+            lines.append(f"- 投資近況: {interests['investment']['note']}")
+        if interests.get("tech", {}).get("note"):
+            lines.append(f"- 技術への関心: {interests['tech']['note']}")
+        if state.get("personality_notes"):
+            lines.append("- 性格メモ: " + " / ".join(state["personality_notes"]))
+        return "\n".join(lines)
+    except Exception:
+        return ""
 
 def generate_article(news_list: List[Dict[str, str]]) -> Dict[str, str]:
     """
@@ -30,7 +59,14 @@ def generate_article(news_list: List[Dict[str, str]]) -> Dict[str, str]:
     for i, news in enumerate(news_list, 1):
         news_text += f"News {i}:\nTitle: {news['title']}\nSummary: {news['summary']}\nSource: {news.get('source', '')}\nLink: {news['link']}\n\n"
 
-    print("Generating tech trend summary article...")
+    print("Generating article...")
+
+    # ぎんじの現在の状態を注入
+    ginji_state_text = load_ginji_state()
+    state_section = f"""
+## ぎんじの現在の状態（これを自然に記事に滲ませてください）
+{ginji_state_text}
+""" if ginji_state_text else ""
 
     prompt = f"""あなたは30代の現役SE「ぎんじ」として、今日の記事を書いてください。
 
@@ -76,6 +112,7 @@ def generate_article(news_list: List[Dict[str, str]]) -> Dict[str, str]:
 個人的な注目度（★1~3つで評価を入れる）
 テクニカルな感想だけでなく、「自分の生活や趣味」「投資目線」「スプラやバドミントとの連想」など一味スパイスを混じえながら、豆知識も交えて語る。
 
+{state_section}
 ## 入力ニュース
 {news_text}
 

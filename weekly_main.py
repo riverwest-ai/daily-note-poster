@@ -11,6 +11,7 @@ from datetime import datetime
 from news_fetcher import fetch_latest_news
 from weekly_article_generator import generate_weekly_article
 from note_poster import post_to_note
+from state_updater import run_update as update_ginji_state
 
 ARTICLES_DIR = os.path.join(os.path.dirname(__file__), "articles")
 
@@ -71,6 +72,13 @@ def main():
     except Exception as e:
         print(f"\n❌ 投稿に失敗しました: {e}")
         print(f"   記事はファイルに保存済みです: {saved_path}")
+
+    # 5. ぎんじの状態を小さく進化させる
+    print("\n[ボーナス] ぎんじの状態を少し変化させます...")
+    try:
+        update_ginji_state()
+    except Exception as e:
+        print(f"   状態アップデートに失敗（記事投稿には影響なし）: {e}")
 
 
 if __name__ == "__main__":
