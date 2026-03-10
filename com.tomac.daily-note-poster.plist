@@ -10,15 +10,9 @@
         <string>/Users/tomac/.gemini/antigravity/scratch/daily-note-poster/run.sh</string>
     </array>
 
-    <!-- 1日2回実行: 朝7:30と夜19:30（その後0〜30分のランダム遅延） -->
+    <!-- 1日1回実行: 夜19:30（その後0〜30分のランダム遅延） -->
     <key>StartCalendarInterval</key>
     <array>
-        <dict>
-            <key>Hour</key>
-            <integer>7</integer>
-            <key>Minute</key>
-            <integer>30</integer>
-        </dict>
         <dict>
             <key>Hour</key>
             <integer>19</integer>

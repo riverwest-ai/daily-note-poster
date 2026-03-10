@@ -1,6 +1,6 @@
 #!/bin/bash
 # スケジューラーのセットアップスクリプト
-# このスクリプトを一度実行すると、毎日8:00と18:00に自動投稿が設定されます。
+# このスクリプトを一度実行すると、毎日19:30に自動投稿が設定されます。
 
 PLIST_NAME="com.tomac.daily-note-poster"
 PLIST_SRC="$(cd "$(dirname "$0")" && pwd)/${PLIST_NAME}.plist"
@@ -30,8 +30,7 @@ echo ""
 echo "✅ 設定完了!"
 echo ""
 echo "スケジュール:"
-echo "  - 毎日 08:00 に実行"
-echo "  - 毎日 18:00 に実行"
+echo "  - 毎日 19:30 に実行"
 echo ""
 echo "ログは以下に保存されます:"
 echo "  $(cd "$(dirname "$0")" && pwd)/logs/"
