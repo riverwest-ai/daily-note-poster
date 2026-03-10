@@ -2,8 +2,8 @@ from playwright.sync_api import sync_playwright
 import os
 import time
 
-# データ保存用ディレクトリ
-USER_DATA_DIR = os.path.join(os.getcwd(), "browser_data")
+# データ保存用ディレクトリ (note_poster.py と統一)
+USER_DATA_DIR = os.path.join(os.getcwd(), "chrome_session")
 
 def setup_login():
     """

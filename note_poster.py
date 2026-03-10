@@ -1,69 +1,16 @@
 import os
 import time
-import shutil
 from playwright.sync_api import sync_playwright
 from typing import Dict
 
-# Macの標準的なChromeプロファイルパス
-CHROME_PROFILE_PATH = os.path.expanduser("~/Library/Application Support/Google/Chrome")
-
-# セッション情報のコピー先
+# 自動投稿専用の永続化プロファイルディレクトリ
 TEMP_PROFILE_DIR = os.path.join(os.getcwd(), "chrome_session")
-
-def _prepare_session():
-    """
-    Chromeプロファイルから最低限のCookie/セッション情報だけをコピーする。
-    """
-    default_profile = os.path.join(CHROME_PROFILE_PATH, "Default")
-    dest_default = os.path.join(TEMP_PROFILE_DIR, "Default")
-    
-    # 既にセッションコピーが存在していて比較的新しければスキップ
-    cookie_dest = os.path.join(dest_default, "Cookies")
-    if os.path.exists(cookie_dest):
-        age = time.time() - os.path.getmtime(cookie_dest)
-        if age < 3600:
-            print("Cached session found (< 1 hour old). Reusing.")
-            return
-    
-    print("Copying session data from Chrome profile...")
-    os.makedirs(dest_default, exist_ok=True)
-    
-    files_to_copy = [
-        "Cookies",
-        "Cookies-journal",
-        "Login Data",
-        "Login Data-journal",
-        "Web Data",
-        "Web Data-journal",
-        "Preferences",
-        "Secure Preferences",
-    ]
-    
-    for fname in files_to_copy:
-        src = os.path.join(default_profile, fname)
-        dst = os.path.join(dest_default, fname)
-        if os.path.exists(src):
-            try:
-                shutil.copy2(src, dst)
-            except Exception as e:
-                print(f"Warning: Could not copy {fname}: {e}")
-    
-    local_state_src = os.path.join(CHROME_PROFILE_PATH, "Local State")
-    local_state_dst = os.path.join(TEMP_PROFILE_DIR, "Local State")
-    if os.path.exists(local_state_src):
-        try:
-            shutil.copy2(local_state_src, local_state_dst)
-        except Exception as e:
-            print(f"Warning: Could not copy Local State: {e}")
-    
-    print("Session data copied.")
 
 def post_to_note(article: Dict[str, str], is_draft: bool = True):
     """
-    Posts an article to note.com using a lightweight copy of Chrome session.
+    Posts an article to note.com using a dedicated persistent Chrome session.
     """
-    _prepare_session()
-    print("Launching browser...")
+    print("Launching browser with persistent session...")
 
     # ハッシュタグを取得（存在する場合）
     hashtags = article.get('hashtags', [])

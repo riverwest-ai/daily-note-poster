@@ -2,17 +2,15 @@ import os
 import time
 from playwright.sync_api import sync_playwright
 
-from note_poster import _prepare_session, TEMP_PROFILE_DIR
+from note_poster import TEMP_PROFILE_DIR
 
 def test_authentication():
     """
     note_poster.pyの認証部分だけをテストするスクリプト。
-    セッション（Chromeプロファイル）をコピーし、noteにアクセスしてログイン状態を確認します。
+    noteにアクセスしてログイン状態を確認します。
     """
     print("=== 認証テストを開始します ===")
-    
-    # セッション準備（note_poster.pyと同じ処理）
-    _prepare_session()
+    print(f"使用プロファイル: {TEMP_PROFILE_DIR}")
     
     print("\nブラウザを起動して、note.comへアクセスします...")
     
@@ -37,9 +35,9 @@ def test_authentication():
                 print("note_poster.py 実行時に認証エラーが発生する原因はこれです。")
                 print("\n【解決方法】")
                 print("1. このテストスクリプトを終了します。")
-                print("2. 普段お使いの「Google Chrome」を開きます。")
-                print("3. note.comにアクセスし、ログインを完了させます。")
-                print("4. もう一度このテストを実行して、「✅ ログイン済み」になるか確認してください。")
+                print("2. ターミナルで `python setup_login.py` を実行します。")
+                print("3. 開いたブラウザで note.com にアクセスし、ログインを完了させます。")
+                print("4. その後、もう一度このテストを実行して、「✅ ログイン済み」になるか確認してください。")
             else:
                 print("\n✅ ログイン済み（セッション有効）です！")
                 print("note_poster.py の認証は正常に通過できるはずです。")
