@@ -6,6 +6,9 @@ on:
     - cron: '30 10 * * *'
   workflow_dispatch:        # 手動実行も可能
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   generate-article:
     runs-on: ubuntu-latest
